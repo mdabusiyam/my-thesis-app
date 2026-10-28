@@ -7,18 +7,20 @@ on:
 jobs:
   build-test-measure:
     runs-on: ubuntu-latest
+    env:
+      ECO_CI_SEND_DATA: "false"
+      CO2_CALCULATION_METHOD: "location-based"
+      CO2_GRID_INTENSITY_API_TOKEN: ${{ secrets.CO2SIGNAL_API_KEY }}
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # 1. Start Measurement with Live Grid Location-Based Carbon Lookup
+      # 1. Start Energy Profiling
       - name: Start Eco-CI Measurement
         uses: green-coding-solutions/eco-ci-energy-estimation@v4
         with:
           task: start-measurement
-          send-data: "false"
-          co2-calculation-method: "location-based"
-          co2-grid-intensity-api-token: ${{ secrets.CO2SIGNAL_API_KEY }}
 
       # 2. Setup Node & Run CI Tests
       - name: Setup Node.js
@@ -38,11 +40,9 @@ jobs:
         with:
           task: get-measurement
           label: "Automated Testing Step"
-          send-data: "false"
 
       # 4. Show Energy & Carbon Summary
       - name: Show Energy Summary
         uses: green-coding-solutions/eco-ci-energy-estimation@v4
         with:
           task: display-results
-          send-data: "false"
