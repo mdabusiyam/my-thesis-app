@@ -11,39 +11,34 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # 1. Fetch Real-Time Grid Carbon Intensity using ELECTRICITYMAPS_API_TOKEN
+      # 1. Fetch Real-Time Carbon Intensity from Electricity Maps API
       - name: Fetch Real-Time Carbon Intensity
-        id: fetch-grid-carbon
         run: |
           API_KEY="${{ secrets.ELECTRICITYMAPS_API_TOKEN }}"
-          
-          # Query Electricity Maps API v3 for US-East zone
           RESPONSE=$(curl -s -H "auth-token: $API_KEY" "https://api.electricitymaps.com/v3/carbon-intensity/latest?zone=US-EAST-1" || true)
           INTENSITY=$(echo "$RESPONSE" | jq -r '.carbonIntensity // empty')
 
-          # Fallback to CO2Signal API endpoint if v3 response is empty
           if [ -z "$INTENSITY" ] || [ "$INTENSITY" = "null" ]; then
             RESPONSE=$(curl -s -H "auth-token: $API_KEY" "https://api.co2signal.com/v1/latest?countryCode=US-EAST-1" || true)
             INTENSITY=$(echo "$RESPONSE" | jq -r '.data.carbonIntensity // empty')
           fi
 
-          # Fallback to standard baseline if API call fails
           if [ -z "$INTENSITY" ] || [ "$INTENSITY" = "null" ]; then
-            echo "API lookup returned empty, using active baseline intensity."
             INTENSITY=420
           fi
 
           echo "LIVE_CARBON_INTENSITY=$INTENSITY" >> $GITHUB_ENV
-          echo "Successfully fetched live grid carbon intensity: ${INTENSITY} gCO2e/kWh"
+          echo "Fetched Live Grid Carbon Intensity: ${INTENSITY} gCO2e/kWh"
 
-      # 2. Pass Live Real-Time Grid Carbon into Eco-CI
+      # 2. Start Measurement with Environment Variables
       - name: Start Eco-CI Measurement
         uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        env:
+          CO2_CALCULATION_METHOD: "constant"
+          CO2_GRID_INTENSITY_CONSTANT: ${{ env.LIVE_CARBON_INTENSITY }}
+          ECO_CI_SEND_DATA: "false"
         with:
           task: start-measurement
-          send-data: "false"
-          co2-calculation-method: "constant"
-          co2-grid-intensity-constant: ${{ env.LIVE_CARBON_INTENSITY }}
 
       # 3. Setup Node & Run CI Tests
       - name: Setup Node.js
@@ -60,14 +55,16 @@ jobs:
       # 4. Measure Testing Step Energy
       - name: Measure Test Energy
         uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        env:
+          ECO_CI_SEND_DATA: "false"
         with:
           task: get-measurement
           label: "Automated Testing Step"
-          send-data: "false"
 
-      # 5. Show Summary Table with Real-Time Carbon Output
+      # 5. Show Summary Table
       - name: Show Energy Summary
         uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        env:
+          ECO_CI_SEND_DATA: "false"
         with:
           task: display-results
-          send-data: "false"
