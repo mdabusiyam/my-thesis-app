@@ -16,6 +16,7 @@ jobs:
         uses: green-coding-solutions/eco-ci-energy-estimation@v4
         with:
           task: start-measurement
+          send-data: "false"
 
       # 2. Setup Node & Run CI Tests
       - name: Setup Node.js
@@ -35,10 +36,11 @@ jobs:
         with:
           task: get-measurement
           label: "Automated Testing Step"
+          send-data: "false"
 
       # 4. Show Energy Breakdown Summary Table
       - name: Show Energy Summary
         uses: green-coding-solutions/eco-ci-energy-estimation@v4
         with:
           task: display-results
-          send-data: false
+          send-data: "false"
