@@ -63,3 +63,919 @@ jobs:
           echo "LIVE GRID CARBON INTENSITY : ${INTENSITY} gCO2e/kWh"
           echo "FORMULA                    : Carbon (gCO2e) = Energy (Joules) * Intensity / 3.6e6"
           echo "=========================================================="
+name: CI/CD Pipeline with Energy Measurement
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-test-measure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 1. Start Energy Profiling (CO2 IP lookup disabled)
+      - name: Start Eco-CI Measurement
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: start-measurement
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 2. Setup Node & Run CI Tests
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Automated Tests
+        run: npm test
+
+      # 3. Measure Testing Step Energy
+      - name: Measure Test Energy
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: get-measurement
+          label: "Automated Testing Step"
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 4. Display Clean Summary Table (Energy Only)
+      - name: Show Energy Summary
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: display-results
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 5. Fetch Real-Time Carbon Intensity & Calculate Emissions
+      - name: Real-Time Grid Carbon Calculation (Live API)
+        run: |
+          API_KEY="${{ secrets.ELECTRICITYMAPS_API_TOKEN }}"
+          RESPONSE=$(curl -s -H "auth-token: $API_KEY" "https://api.co2signal.com/v1/latest?countryCode=US-EAST-1" || true)
+          INTENSITY=$(echo "$RESPONSE" | jq -r '.data.carbonIntensity // empty')
+          
+          if [ -z "$INTENSITY" ] || [ "$INTENSITY" = "null" ]; then
+            INTENSITY=420
+          fi
+          
+          echo "=========================================================="
+          echo "LIVE GRID CARBON INTENSITY : ${INTENSITY} gCO2e/kWh"
+          echo "FORMULA                    : Carbon (gCO2e) = Energy (Joules) * Intensity / 3.6e6"
+          echo "=========================================================="
+name: CI/CD Pipeline with Energy Measurement
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-test-measure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 1. Start Energy Profiling (CO2 IP lookup disabled)
+      - name: Start Eco-CI Measurement
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: start-measurement
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 2. Setup Node & Run CI Tests
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Automated Tests
+        run: npm test
+
+      # 3. Measure Testing Step Energy
+      - name: Measure Test Energy
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: get-measurement
+          label: "Automated Testing Step"
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 4. Display Clean Summary Table (Energy Only)
+      - name: Show Energy Summary
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: display-results
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 5. Fetch Real-Time Carbon Intensity & Calculate Emissions
+      - name: Real-Time Grid Carbon Calculation (Live API)
+        run: |
+          API_KEY="${{ secrets.ELECTRICITYMAPS_API_TOKEN }}"
+          RESPONSE=$(curl -s -H "auth-token: $API_KEY" "https://api.co2signal.com/v1/latest?countryCode=US-EAST-1" || true)
+          INTENSITY=$(echo "$RESPONSE" | jq -r '.data.carbonIntensity // empty')
+          
+          if [ -z "$INTENSITY" ] || [ "$INTENSITY" = "null" ]; then
+            INTENSITY=420
+          fi
+          
+          echo "=========================================================="
+          echo "LIVE GRID CARBON INTENSITY : ${INTENSITY} gCO2e/kWh"
+          echo "FORMULA                    : Carbon (gCO2e) = Energy (Joules) * Intensity / 3.6e6"
+          echo "=========================================================="
+name: CI/CD Pipeline with Energy Measurement
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-test-measure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 1. Start Energy Profiling (CO2 IP lookup disabled)
+      - name: Start Eco-CI Measurement
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: start-measurement
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 2. Setup Node & Run CI Tests
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Automated Tests
+        run: npm test
+
+      # 3. Measure Testing Step Energy
+      - name: Measure Test Energy
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: get-measurement
+          label: "Automated Testing Step"
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 4. Display Clean Summary Table (Energy Only)
+      - name: Show Energy Summary
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: display-results
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 5. Fetch Real-Time Carbon Intensity & Calculate Emissions
+      - name: Real-Time Grid Carbon Calculation (Live API)
+        run: |
+          API_KEY="${{ secrets.ELECTRICITYMAPS_API_TOKEN }}"
+          RESPONSE=$(curl -s -H "auth-token: $API_KEY" "https://api.co2signal.com/v1/latest?countryCode=US-EAST-1" || true)
+          INTENSITY=$(echo "$RESPONSE" | jq -r '.data.carbonIntensity // empty')
+          
+          if [ -z "$INTENSITY" ] || [ "$INTENSITY" = "null" ]; then
+            INTENSITY=420
+          fi
+          
+          echo "=========================================================="
+          echo "LIVE GRID CARBON INTENSITY : ${INTENSITY} gCO2e/kWh"
+          echo "FORMULA                    : Carbon (gCO2e) = Energy (Joules) * Intensity / 3.6e6"
+          echo "=========================================================="
+name: CI/CD Pipeline with Energy Measurement
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-test-measure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 1. Start Energy Profiling (CO2 IP lookup disabled)
+      - name: Start Eco-CI Measurement
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: start-measurement
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 2. Setup Node & Run CI Tests
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Automated Tests
+        run: npm test
+
+      # 3. Measure Testing Step Energy
+      - name: Measure Test Energy
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: get-measurement
+          label: "Automated Testing Step"
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 4. Display Clean Summary Table (Energy Only)
+      - name: Show Energy Summary
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: display-results
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 5. Fetch Real-Time Carbon Intensity & Calculate Emissions
+      - name: Real-Time Grid Carbon Calculation (Live API)
+        run: |
+          API_KEY="${{ secrets.ELECTRICITYMAPS_API_TOKEN }}"
+          RESPONSE=$(curl -s -H "auth-token: $API_KEY" "https://api.co2signal.com/v1/latest?countryCode=US-EAST-1" || true)
+          INTENSITY=$(echo "$RESPONSE" | jq -r '.data.carbonIntensity // empty')
+          
+          if [ -z "$INTENSITY" ] || [ "$INTENSITY" = "null" ]; then
+            INTENSITY=420
+          fi
+          
+          echo "=========================================================="
+          echo "LIVE GRID CARBON INTENSITY : ${INTENSITY} gCO2e/kWh"
+          echo "FORMULA                    : Carbon (gCO2e) = Energy (Joules) * Intensity / 3.6e6"
+          echo "=========================================================="
+name: CI/CD Pipeline with Energy Measurement
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-test-measure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 1. Start Energy Profiling (CO2 IP lookup disabled)
+      - name: Start Eco-CI Measurement
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: start-measurement
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 2. Setup Node & Run CI Tests
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Automated Tests
+        run: npm test
+
+      # 3. Measure Testing Step Energy
+      - name: Measure Test Energy
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: get-measurement
+          label: "Automated Testing Step"
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 4. Display Clean Summary Table (Energy Only)
+      - name: Show Energy Summary
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: display-results
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 5. Fetch Real-Time Carbon Intensity & Calculate Emissions
+      - name: Real-Time Grid Carbon Calculation (Live API)
+        run: |
+          API_KEY="${{ secrets.ELECTRICITYMAPS_API_TOKEN }}"
+          RESPONSE=$(curl -s -H "auth-token: $API_KEY" "https://api.co2signal.com/v1/latest?countryCode=US-EAST-1" || true)
+          INTENSITY=$(echo "$RESPONSE" | jq -r '.data.carbonIntensity // empty')
+          
+          if [ -z "$INTENSITY" ] || [ "$INTENSITY" = "null" ]; then
+            INTENSITY=420
+          fi
+          
+          echo "=========================================================="
+          echo "LIVE GRID CARBON INTENSITY : ${INTENSITY} gCO2e/kWh"
+          echo "FORMULA                    : Carbon (gCO2e) = Energy (Joules) * Intensity / 3.6e6"
+          echo "=========================================================="
+name: CI/CD Pipeline with Energy Measurement
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-test-measure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 1. Start Energy Profiling (CO2 IP lookup disabled)
+      - name: Start Eco-CI Measurement
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: start-measurement
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 2. Setup Node & Run CI Tests
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Automated Tests
+        run: npm test
+
+      # 3. Measure Testing Step Energy
+      - name: Measure Test Energy
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: get-measurement
+          label: "Automated Testing Step"
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 4. Display Clean Summary Table (Energy Only)
+      - name: Show Energy Summary
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: display-results
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 5. Fetch Real-Time Carbon Intensity & Calculate Emissions
+      - name: Real-Time Grid Carbon Calculation (Live API)
+        run: |
+          API_KEY="${{ secrets.ELECTRICITYMAPS_API_TOKEN }}"
+          RESPONSE=$(curl -s -H "auth-token: $API_KEY" "https://api.co2signal.com/v1/latest?countryCode=US-EAST-1" || true)
+          INTENSITY=$(echo "$RESPONSE" | jq -r '.data.carbonIntensity // empty')
+          
+          if [ -z "$INTENSITY" ] || [ "$INTENSITY" = "null" ]; then
+            INTENSITY=420
+          fi
+          
+          echo "=========================================================="
+          echo "LIVE GRID CARBON INTENSITY : ${INTENSITY} gCO2e/kWh"
+          echo "FORMULA                    : Carbon (gCO2e) = Energy (Joules) * Intensity / 3.6e6"
+          echo "=========================================================="
+name: CI/CD Pipeline with Energy Measurement
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-test-measure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 1. Start Energy Profiling (CO2 IP lookup disabled)
+      - name: Start Eco-CI Measurement
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: start-measurement
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 2. Setup Node & Run CI Tests
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Automated Tests
+        run: npm test
+
+      # 3. Measure Testing Step Energy
+      - name: Measure Test Energy
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: get-measurement
+          label: "Automated Testing Step"
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 4. Display Clean Summary Table (Energy Only)
+      - name: Show Energy Summary
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: display-results
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 5. Fetch Real-Time Carbon Intensity & Calculate Emissions
+      - name: Real-Time Grid Carbon Calculation (Live API)
+        run: |
+          API_KEY="${{ secrets.ELECTRICITYMAPS_API_TOKEN }}"
+          RESPONSE=$(curl -s -H "auth-token: $API_KEY" "https://api.co2signal.com/v1/latest?countryCode=US-EAST-1" || true)
+          INTENSITY=$(echo "$RESPONSE" | jq -r '.data.carbonIntensity // empty')
+          
+          if [ -z "$INTENSITY" ] || [ "$INTENSITY" = "null" ]; then
+            INTENSITY=420
+          fi
+          
+          echo "=========================================================="
+          echo "LIVE GRID CARBON INTENSITY : ${INTENSITY} gCO2e/kWh"
+          echo "FORMULA                    : Carbon (gCO2e) = Energy (Joules) * Intensity / 3.6e6"
+          echo "=========================================================="
+name: CI/CD Pipeline with Energy Measurement
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-test-measure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 1. Start Energy Profiling (CO2 IP lookup disabled)
+      - name: Start Eco-CI Measurement
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: start-measurement
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 2. Setup Node & Run CI Tests
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Automated Tests
+        run: npm test
+
+      # 3. Measure Testing Step Energy
+      - name: Measure Test Energy
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: get-measurement
+          label: "Automated Testing Step"
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 4. Display Clean Summary Table (Energy Only)
+      - name: Show Energy Summary
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: display-results
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 5. Fetch Real-Time Carbon Intensity & Calculate Emissions
+      - name: Real-Time Grid Carbon Calculation (Live API)
+        run: |
+          API_KEY="${{ secrets.ELECTRICITYMAPS_API_TOKEN }}"
+          RESPONSE=$(curl -s -H "auth-token: $API_KEY" "https://api.co2signal.com/v1/latest?countryCode=US-EAST-1" || true)
+          INTENSITY=$(echo "$RESPONSE" | jq -r '.data.carbonIntensity // empty')
+          
+          if [ -z "$INTENSITY" ] || [ "$INTENSITY" = "null" ]; then
+            INTENSITY=420
+          fi
+          
+          echo "=========================================================="
+          echo "LIVE GRID CARBON INTENSITY : ${INTENSITY} gCO2e/kWh"
+          echo "FORMULA                    : Carbon (gCO2e) = Energy (Joules) * Intensity / 3.6e6"
+          echo "=========================================================="
+name: CI/CD Pipeline with Energy Measurement
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-test-measure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 1. Start Energy Profiling (CO2 IP lookup disabled)
+      - name: Start Eco-CI Measurement
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: start-measurement
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 2. Setup Node & Run CI Tests
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Automated Tests
+        run: npm test
+
+      # 3. Measure Testing Step Energy
+      - name: Measure Test Energy
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: get-measurement
+          label: "Automated Testing Step"
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 4. Display Clean Summary Table (Energy Only)
+      - name: Show Energy Summary
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: display-results
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 5. Fetch Real-Time Carbon Intensity & Calculate Emissions
+      - name: Real-Time Grid Carbon Calculation (Live API)
+        run: |
+          API_KEY="${{ secrets.ELECTRICITYMAPS_API_TOKEN }}"
+          RESPONSE=$(curl -s -H "auth-token: $API_KEY" "https://api.co2signal.com/v1/latest?countryCode=US-EAST-1" || true)
+          INTENSITY=$(echo "$RESPONSE" | jq -r '.data.carbonIntensity // empty')
+          
+          if [ -z "$INTENSITY" ] || [ "$INTENSITY" = "null" ]; then
+            INTENSITY=420
+          fi
+          
+          echo "=========================================================="
+          echo "LIVE GRID CARBON INTENSITY : ${INTENSITY} gCO2e/kWh"
+          echo "FORMULA                    : Carbon (gCO2e) = Energy (Joules) * Intensity / 3.6e6"
+          echo "=========================================================="
+name: CI/CD Pipeline with Energy Measurement
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-test-measure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 1. Start Energy Profiling (CO2 IP lookup disabled)
+      - name: Start Eco-CI Measurement
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: start-measurement
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 2. Setup Node & Run CI Tests
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Automated Tests
+        run: npm test
+
+      # 3. Measure Testing Step Energy
+      - name: Measure Test Energy
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: get-measurement
+          label: "Automated Testing Step"
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 4. Display Clean Summary Table (Energy Only)
+      - name: Show Energy Summary
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: display-results
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 5. Fetch Real-Time Carbon Intensity & Calculate Emissions
+      - name: Real-Time Grid Carbon Calculation (Live API)
+        run: |
+          API_KEY="${{ secrets.ELECTRICITYMAPS_API_TOKEN }}"
+          RESPONSE=$(curl -s -H "auth-token: $API_KEY" "https://api.co2signal.com/v1/latest?countryCode=US-EAST-1" || true)
+          INTENSITY=$(echo "$RESPONSE" | jq -r '.data.carbonIntensity // empty')
+          
+          if [ -z "$INTENSITY" ] || [ "$INTENSITY" = "null" ]; then
+            INTENSITY=420
+          fi
+          
+          echo "=========================================================="
+          echo "LIVE GRID CARBON INTENSITY : ${INTENSITY} gCO2e/kWh"
+          echo "FORMULA                    : Carbon (gCO2e) = Energy (Joules) * Intensity / 3.6e6"
+          echo "=========================================================="
+name: CI/CD Pipeline with Energy Measurement
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-test-measure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 1. Start Energy Profiling (CO2 IP lookup disabled)
+      - name: Start Eco-CI Measurement
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: start-measurement
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 2. Setup Node & Run CI Tests
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Automated Tests
+        run: npm test
+
+      # 3. Measure Testing Step Energy
+      - name: Measure Test Energy
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: get-measurement
+          label: "Automated Testing Step"
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 4. Display Clean Summary Table (Energy Only)
+      - name: Show Energy Summary
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: display-results
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 5. Fetch Real-Time Carbon Intensity & Calculate Emissions
+      - name: Real-Time Grid Carbon Calculation (Live API)
+        run: |
+          API_KEY="${{ secrets.ELECTRICITYMAPS_API_TOKEN }}"
+          RESPONSE=$(curl -s -H "auth-token: $API_KEY" "https://api.co2signal.com/v1/latest?countryCode=US-EAST-1" || true)
+          INTENSITY=$(echo "$RESPONSE" | jq -r '.data.carbonIntensity // empty')
+          
+          if [ -z "$INTENSITY" ] || [ "$INTENSITY" = "null" ]; then
+            INTENSITY=420
+          fi
+          
+          echo "=========================================================="
+          echo "LIVE GRID CARBON INTENSITY : ${INTENSITY} gCO2e/kWh"
+          echo "FORMULA                    : Carbon (gCO2e) = Energy (Joules) * Intensity / 3.6e6"
+          echo "=========================================================="
+name: CI/CD Pipeline with Energy Measurement
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-test-measure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 1. Start Energy Profiling (CO2 IP lookup disabled)
+      - name: Start Eco-CI Measurement
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: start-measurement
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 2. Setup Node & Run CI Tests
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Automated Tests
+        run: npm test
+
+      # 3. Measure Testing Step Energy
+      - name: Measure Test Energy
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: get-measurement
+          label: "Automated Testing Step"
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 4. Display Clean Summary Table (Energy Only)
+      - name: Show Energy Summary
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: display-results
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 5. Fetch Real-Time Carbon Intensity & Calculate Emissions
+      - name: Real-Time Grid Carbon Calculation (Live API)
+        run: |
+          API_KEY="${{ secrets.ELECTRICITYMAPS_API_TOKEN }}"
+          RESPONSE=$(curl -s -H "auth-token: $API_KEY" "https://api.co2signal.com/v1/latest?countryCode=US-EAST-1" || true)
+          INTENSITY=$(echo "$RESPONSE" | jq -r '.data.carbonIntensity // empty')
+          
+          if [ -z "$INTENSITY" ] || [ "$INTENSITY" = "null" ]; then
+            INTENSITY=420
+          fi
+          
+          echo "=========================================================="
+          echo "LIVE GRID CARBON INTENSITY : ${INTENSITY} gCO2e/kWh"
+          echo "FORMULA                    : Carbon (gCO2e) = Energy (Joules) * Intensity / 3.6e6"
+          echo "=========================================================="
+name: CI/CD Pipeline with Energy Measurement
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-test-measure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 1. Start Energy Profiling (CO2 IP lookup disabled)
+      - name: Start Eco-CI Measurement
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: start-measurement
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 2. Setup Node & Run CI Tests
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Automated Tests
+        run: npm test
+
+      # 3. Measure Testing Step Energy
+      - name: Measure Test Energy
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: get-measurement
+          label: "Automated Testing Step"
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 4. Display Clean Summary Table (Energy Only)
+      - name: Show Energy Summary
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: display-results
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 5. Fetch Real-Time Carbon Intensity & Calculate Emissions
+      - name: Real-Time Grid Carbon Calculation (Live API)
+        run: |
+          API_KEY="${{ secrets.ELECTRICITYMAPS_API_TOKEN }}"
+          RESPONSE=$(curl -s -H "auth-token: $API_KEY" "https://api.co2signal.com/v1/latest?countryCode=US-EAST-1" || true)
+          INTENSITY=$(echo "$RESPONSE" | jq -r '.data.carbonIntensity // empty')
+          
+          if [ -z "$INTENSITY" ] || [ "$INTENSITY" = "null" ]; then
+            INTENSITY=420
+          fi
+          
+          echo "=========================================================="
+          echo "LIVE GRID CARBON INTENSITY : ${INTENSITY} gCO2e/kWh"
+          echo "FORMULA                    : Carbon (gCO2e) = Energy (Joules) * Intensity / 3.6e6"
+          echo "=========================================================="
+name: CI/CD Pipeline with Energy Measurement
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-test-measure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 1. Start Energy Profiling (CO2 IP lookup disabled)
+      - name: Start Eco-CI Measurement
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: start-measurement
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 2. Setup Node & Run CI Tests
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Automated Tests
+        run: npm test
+
+      # 3. Measure Testing Step Energy
+      - name: Measure Test Energy
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: get-measurement
+          label: "Automated Testing Step"
+          send-data: "false"
+          calculate-co2: "false"
+
+      # 4. Display Clean Summary Table (Energy Only)
+      - name: Show Energy Summary
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: display-results
+          send-data: "false"
+          calculate-co2: "false"
+
+# 5. Fetch Real-Time Carbon Intensity & Calculate Emissions
+      - name: Real-Time Grid Carbon Calculation (Live API)
+        run: |
+          API_KEY="${{ secrets.ELECTRICITYMAPS_API_TOKEN }}"
+          
+          # Query Electricity Maps v3 API for US-NY zone
+          RESPONSE=$(curl -s -H "auth-token: $API_KEY" "https://api.electricitymaps.com/v3/carbon-intensity/latest?zone=US-NY")
+          echo "Raw API Response: $RESPONSE"
+          
+          # Extract carbon intensity from JSON response
+          INTENSITY=$(echo "$RESPONSE" | jq -r '.carbonIntensity // empty')
+          
+          if [ -z "$INTENSITY" ] || [ "$INTENSITY" = "null" ]; then
+            echo "API Key or zone lookup failed. Check Raw API Response above."
+            INTENSITY=420
+          fi
+          
+          echo "=========================================================="
+          echo "LIVE GRID CARBON INTENSITY : ${INTENSITY} gCO2e/kWh"
+          echo "FORMULA                    : Carbon (gCO2e) = Energy (Joules) * Intensity / 3.6e6"
+          echo "=========================================================="
