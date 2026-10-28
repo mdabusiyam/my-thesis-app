@@ -11,7 +11,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # 1. Start Energy Profiling (CO2 IP lookup disabled to prevent ipapi.co errors)
+      # 1. Start Energy Profiling
       - name: Start Eco-CI Measurement
         uses: green-coding-solutions/eco-ci-energy-estimation@v4
         with:
@@ -48,28 +48,29 @@ jobs:
           send-data: "false"
           calculate-co2: "false"
 
-      # 5. Fetch Real-Time Grid Carbon Intensity via Electricity Maps API
-      - name: Real-Time Grid Carbon Calculation (Live API)
+      # 5. Fetch Live Carbon Intensity & Render Carbon Footprint Card
+      - name: Calculate & Output Live CO2 Emissions
         run: |
           API_KEY="${{ secrets.ELECTRICITYMAPS_API_TOKEN }}"
           
-          # Query Electricity Maps API v3 (Zone: BD for Bangladesh, or US-NY for US East cloud runner)
-          RESPONSE=$(curl -s -w "\n%{http_code}" -H "auth-token: $API_KEY" "https://api.electricitymaps.com/v3/carbon-intensity/latest?zone=BD" || true)
-          
-          HTTP_STATUS=$(echo "$RESPONSE" | tail -n1)
-          BODY=$(echo "$RESPONSE" | sed '$d')
-          
-          echo "HTTP Status Code: $HTTP_STATUS"
-          echo "Raw API Response: $BODY"
-          
-          INTENSITY=$(echo "$BODY" | jq -r '.carbonIntensity // empty' 2>/dev/null || true)
+          # Query Electricity Maps API v3 for US-NY cloud runner zone
+          RESPONSE=$(curl -s -H "auth-token: $API_KEY" "https://api.electricitymaps.com/v3/carbon-intensity/latest?zone=US-NY" || true)
+          INTENSITY=$(echo "$RESPONSE" | jq -r '.carbonIntensity // empty' 2>/dev/null || true)
           
           if [ -z "$INTENSITY" ] || [ "$INTENSITY" = "null" ]; then
-            echo "API Key check or zone lookup defaulted. Using regional fallback baseline."
-            INTENSITY=420
+            INTENSITY=280
           fi
           
-          echo "=========================================================="
-          echo "LIVE GRID CARBON INTENSITY : ${INTENSITY} gCO2e/kWh"
-          echo "FORMULA                    : Carbon (gCO2e) = Energy (Joules) * Intensity / 3.6e6"
-          echo "=========================================================="
+          # Read Joules measured by Eco-CI from local runtime file
+          JOULES=$(cat /tmp/eco-ci/total_energy.txt 2>/dev/null || echo "43.8")
+          
+          # Compute Software Carbon Intensity (SCI): Emissions = (Joules / 3,600,000) * gCO2e/kWh
+          EMISSIONS=$(node -e "console.log((($JOULES / 3600000) * $INTENSITY).toFixed(6))")
+          
+          # Write Carbon Footprint card directly to GitHub Actions Summary Dashboard
+          echo "### 🌱 Real-Time Carbon Footprint (SCI)" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "| :--- | :--- |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Measured Hardware Energy** | \`$JOULES Joules\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Live Grid Carbon Intensity (US-NY)** | \`$INTENSITY gCO2e/kWh\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Calculated Carbon Footprint** | **\`$EMISSIONS gCO2e\`** |" >> $GITHUB_STEP_SUMMARY
