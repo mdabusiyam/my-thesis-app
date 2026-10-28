@@ -11,43 +11,9 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # 1. Start Eco-CI Energy Profiling
-      - name: Start Eco-CI Measurement
-        uses: green-coding-solutions/eco-ci-energy-estimation@v4
-        with:
-          task: start-measurement
-          send-data: "false"
-
-      # 2. Setup Node & Run CI Tests
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      - name: Install Dependencies
-        run: npm ci
-
-      - name: Run Automated Tests (CI Stage)
-        run: npm test
-
-      # 3. Measure Testing Step Energy
-      - name: Measure Test Energy
-        uses: green-coding-solutions/eco-ci-energy-estimation@v4
-        with:
-          task: get-measurement
-          label: "Automated Testing Step"
-          send-data: "false"
-
-      # 4. Show Energy Summary Table (Clean, Error-Free)
-      - name: Show Energy Summary
-        uses: green-coding-solutions/eco-ci-energy-estimation@v4
-        with:
-          task: display-results
-          send-data: "false"
-          calculate-co2: "false"
-
-      # 5. Fetch Real-Time Grid Carbon & Calculate SCI (Live API Step)
-      - name: Real-Time Grid Carbon Calculation (Live API)
+      # 1. Fetch Real-Time Grid Carbon Intensity via Live API
+      - name: Fetch Real-Time Carbon Intensity
+        id: fetch-carbon
         run: |
           API_KEY="${{ secrets.ELECTRICITYMAPS_API_TOKEN }}"
           RESPONSE=$(curl -s -H "auth-token: $API_KEY" "https://api.co2signal.com/v1/latest?countryCode=US-EAST-1" || true)
@@ -57,6 +23,41 @@ jobs:
             INTENSITY=420
           fi
           
-          echo "=================================================="
-          echo "LIVE GRID CARBON INTENSITY : ${INTENSITY} gCO2e/kWh"
-          echo "=================================================="
+          echo "INTENSITY=$INTENSITY" >> $GITHUB_ENV
+          echo "Live carbon intensity fetched: ${INTENSITY} gCO2e/kWh"
+
+      # 2. Start Eco-CI Measurement (Writes constant to local state)
+      - name: Start Eco-CI Measurement
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: start-measurement
+          send-data: "false"
+          co2-calculation-method: "constant"
+          co2-grid-intensity-constant: ${{ env.INTENSITY }}
+
+      # 3. Setup Node & Run CI Tests
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Automated Tests
+        run: npm test
+
+      # 4. Measure Energy Consumed during Testing
+      - name: Measure Test Energy
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: get-measurement
+          label: "Automated Testing Step"
+          send-data: "false"
+
+      # 5. Display Final Summary Table
+      - name: Show Energy Summary
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: display-results
+          send-data: "false"
