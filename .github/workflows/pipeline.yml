@@ -1,0 +1,44 @@
+name: CI/CD Pipeline with Energy Measurement
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-test-measure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 1. Start Energy Profiling
+      - name: Start Eco-CI Measurement
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: start-measurement
+
+      # 2. Setup Node & Run CI Tests
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Automated Tests (CI Stage)
+        run: npm test
+
+      # 3. Measure Testing Step Energy
+      - name: Measure Test Energy
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: get-measurement
+          label: "Automated Testing Step"
+
+      # 4. Show Energy Breakdown Summary Table
+      - name: Show Energy Summary
+        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        with:
+          task: display-results
+          send-data: false
