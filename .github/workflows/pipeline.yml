@@ -11,13 +11,14 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # 1. Start Energy Profiling with Constant CO2 Calculation
+      # 1. Start Measurement with Live Grid Location-Based Carbon Lookup
       - name: Start Eco-CI Measurement
         uses: green-coding-solutions/eco-ci-energy-estimation@v4
         with:
           task: start-measurement
           send-data: "false"
-          co2-calculation-method: "constant"
+          co2-calculation-method: "location-based"
+          co2-grid-intensity-api-token: ${{ secrets.CO2SIGNAL_API_KEY }}
 
       # 2. Setup Node & Run CI Tests
       - name: Setup Node.js
@@ -39,7 +40,7 @@ jobs:
           label: "Automated Testing Step"
           send-data: "false"
 
-      # 4. Show Energy Breakdown Summary Table
+      # 4. Show Energy & Carbon Summary
       - name: Show Energy Summary
         uses: green-coding-solutions/eco-ci-energy-estimation@v4
         with:
