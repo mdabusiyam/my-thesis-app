@@ -38,9 +38,10 @@ jobs:
           label: "Automated Testing Step"
           send-data: "false"
 
-      # 4. Show Energy Breakdown Summary Table
+      # 4. Show Energy Breakdown Summary Table (Energy Only)
       - name: Show Energy Summary
         uses: green-coding-solutions/eco-ci-energy-estimation@v4
         with:
           task: display-results
           send-data: "false"
+          calculate-co2: "false"
