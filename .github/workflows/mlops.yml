@@ -1,0 +1,39 @@
+name: MLOps CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  test-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 1. Setup Node.js Environment
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm ci
+
+      # 2. CI Stage: Execute Automated Tests
+      - name: Run Automated ML Model Tests
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: npm test
+
+      # 3. CD Stage: Deploy Automatically to Hugging Face Spaces
+      - name: Deploy to Hugging Face Spaces
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          git config --global user.email "ci-runner@github.com"
+          git config --global user.name "GitHub Actions CI"
+          git remote add hf https://user:$HF_TOKEN@huggingface.co/spaces/TechneSiyam/my-ml-app.git || true
+          git push --force hf main
